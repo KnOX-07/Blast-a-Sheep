@@ -1,0 +1,166 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Blast-a-Sheep</title>
+<style>
+    body {
+        margin: 0;
+        overflow: hidden;
+        background-color: #111;
+        color: #fff;
+        font-family: Arial, sans-serif;
+    }
+    canvas {
+        display: block;
+        background-color: #222;
+        margin: 0 auto;
+        border: 2px solid #fff;
+    }
+</style>
+</head>
+<body>
+
+<!-- Popup for player's name -->
+<div id="popup" style="display: none; position: absolute; top: 50%; left: 50%; transform: translate(-50%, -50%); background: rgba(0, 0, 0, 0.5); padding: 20px; border-radius: 10px;">
+    <label for="playerName" style="color: #fff; font-size: 20px;">Enter Player's Name: </label>
+    <input type="text" id="playerName" style="margin-left: 10px; padding: 5px; border-radius: 5px; border: none;">
+    <button onclick="startGame()" style="padding: 5px 10px; border: none; background-color: #33cc33; color: #fff; margin-left: 10px; cursor: pointer;">Start Game</button>
+</div>
+
+<canvas id="gameCanvas" width="800" height="400"></canvas>
+
+<script>
+    const canvas = document.getElementById('gameCanvas');
+    const ctx = canvas.getContext('2d');
+
+    let playerName = '';
+
+    //Function to start the game
+    function startGame() {
+        playerName = document.getElementById('playerName').value;
+        document.getElementById('popup').style.display = 'none';
+        update();
+    }
+
+    //Popup to enter player's name
+    window.onload = function() {
+        document.getElementById('popup').style.display = 'block';
+    };
+
+    //Character properties
+    let characterX = 50; //Initial character X position
+    let characterY = canvas.height / 2; //Initial character Y position
+    let characterWidth = 50;
+    let characterHeight = 50;
+    let characterSpeed = 5;
+
+    //Bullet properties
+    let bullets = [];
+    let bulletSpeed = 10;
+
+    //Target properties
+    let targets = [];
+    let targetWidth = 30;
+    let targetHeight = 30;
+    let targetSpeed = 2;
+    let targetSpawnRate = 100; //Spawn a new target every n frames
+    let targetSpawnCounter = targetSpawnRate;
+
+    //Game properties
+    let score = 0;
+
+    //Event listeners for character movement and shooting
+    document.addEventListener('keydown', function(event) {
+        switch(event.keyCode) {
+            case 38: //Up arrow
+                if (characterY - characterSpeed > 0)
+                    characterY -= characterSpeed;
+                break;
+            case 40: //Down arrow
+                if (characterY + characterSpeed < canvas.height - characterHeight)
+                    characterY += characterSpeed;
+                break;
+            case 32: //Spacebar to shoot
+                bullets.push({ x: characterX + characterWidth, y: characterY + characterHeight / 2 });
+                break;
+        }
+    });
+
+    function update() {
+        //Move targets
+        targets.forEach(target => {
+            target.x -= targetSpeed;
+            if (target.x + targetWidth < 0) {
+                //Remove target if it goes beyond the canvas
+                targets.splice(targets.indexOf(target), 1);
+            }
+            //Check for collision with character
+            if (target.x < characterX + characterWidth &&
+                target.x + targetWidth > characterX &&
+                target.y < characterY + characterHeight &&
+                target.y + targetHeight > characterY) {
+                //Remove target and decrease score(by -10) if my character collides with target
+                targets.splice(targets.indexOf(target), 1);
+                score -= 10;
+            }
+        });
+        //To Spawn new targets
+        targetSpawnCounter--;
+        if (targetSpawnCounter <= 0) {
+            targets.push({ x: canvas.width, y: Math.random() * canvas.height });
+            targetSpawnCounter = targetSpawnRate;
+        }
+        //Move bullets
+        bullets.forEach(bullet => bullet.x += bulletSpeed);
+
+        //Check for collision
+        bullets.forEach(bullet => {
+            targets.forEach(target => {
+                if (bullet.x < target.x + targetWidth &&
+                    bullet.x > target.x &&
+                    bullet.y < target.y + targetHeight &&
+                    bullet.y > target.y) {
+                    //Remove target and bullet if they collide
+                    targets.splice(targets.indexOf(target), 1);
+                    bullets.splice(bullets.indexOf(bullet), 1);
+                    score += 10;
+                }
+            });
+        });
+
+        ctx.clearRect(0, 0, canvas.width, canvas.height);
+
+        //Draw character
+        ctx.fillStyle = '#ff6666';
+        ctx.font = 'bold 30px Arial';
+        ctx.fillText('👹', characterX, characterY + 30);
+
+        //Display player's name
+        ctx.fillStyle = '#fff';
+        ctx.font = 'bold 12px Arial';
+        ctx.fillText(playerName, characterX + 10, characterY - 10);
+
+        //Draw bullets
+        ctx.fillStyle = '#ff0000';
+        bullets.forEach(bullet => ctx.fillRect(bullet.x, bullet.y, 10, 5));
+
+        //Draw targets
+        ctx.fillStyle = '#fff';
+        targets.forEach(target => {
+            ctx.font = 'bold 27px Arial';
+            ctx.fillText('🐑', target.x, target.y + targetHeight);
+        });
+
+        //Get score
+        ctx.fillStyle = '#fff';
+        ctx.font = 'bold 20px Arial';
+        ctx.fillText('Score: ' + score, 10, 30);
+
+        requestAnimationFrame(update);
+    }
+</script>
+
+</body>
+</html>
