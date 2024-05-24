@@ -39,3 +39,6 @@ Blast-a-Sheep is a simple browser-based game that combines elements of a shootin
 
 ## Link to play the game
 https://blast-a-sheep.tiiny.site
+
+## License
+This project is licensed under the MIT License. See the [LICENSE](https://github.com/KnOX-07/Blast-a-Sheep/blob/main/LICENSE) file for details.
