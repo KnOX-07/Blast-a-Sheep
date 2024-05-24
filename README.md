@@ -36,3 +36,6 @@ Blast-a-Sheep is a simple browser-based game that combines elements of a shootin
 2. **Move Character**: Use the up (↑) and down (↓) arrow keys to move your character.
 3. **Shoot Targets**: Press the spacebar to shoot bullets at the incoming sheep targets.
 4. **Score Points**: Destroy as many targets as possible while avoiding collisions to maximize your score.
+
+## Link to play the game
+https://blast-a-sheep.tiiny.site
